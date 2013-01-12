@@ -1,29 +1,30 @@
+$eye-size: 40px;
+$pupil-size: $eye-size * 0.75 - 10; //10px removed for pupil border
 .eye {
-	position: absolute;
+	position: relative;
 	background-color: white;
-	width: 40px;
-	height: 40px;
+	width: $eye-size;
+	height: $eye-size;
 	border: 5px solid black;
-	border-radius: 40px;
-	float: right;
+	border-radius: $eye-size;
+	float: left;
+	margin: -$eye-size/2;
+	top: $eye-size/2;
+	left: $eye-size/2;
 	.pupil {
 		background-color: black;
-		width: 30px;
-		height: 30px;
-		border-radius:30px;
-		&.down {
-			margin-top:10px;
-		}
-		&.right {
-			margin-left:10px;
-		}
+		width: $pupil-size;
+		height: $pupil-size;
+		border-radius:$pupil-size;
+		border: 5px solid black;
+		&.down { margin-top: $eye-size - $pupil-size }
+		&.right { margin-left:$eye-size - $pupil-size }
 	}
 }
 
 .trash {
 	width:100px;
 	height:100px;
-	border:solid 1px black;
 	position: fixed;
 	top: 0;
 	right: 10px;

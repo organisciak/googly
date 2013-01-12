@@ -11,8 +11,7 @@ class Trash
 	show: ->
 		$(".trash").slideDown("fast")
 	hide: ->
-		return
-		#$(".trash").slideUp()
+		$(".trash").slideUp()
 	delete: ->
 		return
 
@@ -31,10 +30,14 @@ eye = (parent) ->
 		stop: -> trash.hide()
 		})
 		.click (e) ->
-			w = $(this).outerWidth()
-			h = $(this).outerHeight()
-			offsetX = 10*e.offsetX/w
-			offsetY = 10*e.offsetY/h
+			console.log "MOUSE OFFSETY #{ e.offsetY }"
+			esize = $(this).outerWidth()
+			console.log "ESIZE #{ esize }"
+			psizeDiff = $(this).innerWidth()-$(this).children(".pupil").outerWidth()
+			console.log "PSIZE #{ psizeDiff }"
+			offsetX = psizeDiff*e.offsetX/esize
+			offsetY = psizeDiff*e.offsetY/esize
+			console.log "PUPIL OFFSETY #{ offsetY }"
 			$(this).children(".pupil").animate(
 				{"margin-left":offsetX,
 				"margin-top":offsetY
