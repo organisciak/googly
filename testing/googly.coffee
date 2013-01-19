@@ -27,7 +27,7 @@ class Eye
 		this.item
 			.draggable({
 				stack:	'.eye'
-				snap: '.trash'
+				#snap: '.trash'
 				snapMode: 'inner'
 				start: -> trash.show()
 				stop: -> trash.hide()
@@ -39,26 +39,35 @@ class Eye
 				googly_storage.add (new Eye $("body") )
 			.append(p)
 			.prependTo(@parent)
+		this.size(40).position(40,40)
 		console.log 'added eye'
 		
 	size: (x) ->
 		that = this.item
+		borderWidth = 1 + x/10
 		that
 			.css("width", x)
 			.css("height", x)
 			.css("border-radius", x)
-			.css("border-width", 1 + x/10)
-			
+			.css("border-width", borderWidth)
+			.css("margin", -x)
+		
+		#Pupil Sizing	
 		that.children(".pupil")
 			.css("width", x/2)
 			.css("height", x/2)
 			.css("border-radius", x/2)
-	
+			
+		#Inverse margins so element doesn't take up any space in parent
+		this
+
 	position: (left, top) ->
 		that = this.item
 		that
 			.css("left", left)
 			.css("top", top)
+		this
+		
 	export: ->
 		### Return object representation of this eye's data ###
 		eye = this.item

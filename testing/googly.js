@@ -46,7 +46,6 @@
       p = $("<div class='pupil'>");
       this.item.draggable({
         stack: '.eye',
-        snap: '.trash',
         snapMode: 'inner',
         start: function() {
           return trash.show();
@@ -61,20 +60,24 @@
       }).dblclick(function(e) {
         return googly_storage.add(new Eye($("body")));
       }).append(p).prependTo(this.parent);
+      this.size(40).position(40, 40);
       console.log('added eye');
     }
 
     Eye.prototype.size = function(x) {
-      var that;
+      var borderWidth, that;
       that = this.item;
-      that.css("width", x).css("height", x).css("border-radius", x).css("border-width", 1 + x / 10);
-      return that.children(".pupil").css("width", x / 2).css("height", x / 2).css("border-radius", x / 2);
+      borderWidth = 1 + x / 10;
+      that.css("width", x).css("height", x).css("border-radius", x).css("border-width", borderWidth).css("margin", -x);
+      that.children(".pupil").css("width", x / 2).css("height", x / 2).css("border-radius", x / 2);
+      return this;
     };
 
     Eye.prototype.position = function(left, top) {
       var that;
       that = this.item;
-      return that.css("left", left).css("top", top);
+      that.css("left", left).css("top", top);
+      return this;
     };
 
     Eye.prototype["export"] = function() {
