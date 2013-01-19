@@ -60,23 +60,38 @@
       }).dblclick(function(e) {
         return googly_storage.add(new Eye($("body")));
       }).append(p).prependTo(this.parent);
-      this.size(40).position(40, 40);
+      this.position(40, 40).size(40);
       console.log('added eye');
     }
 
-    Eye.prototype.size = function(x) {
+    Eye.prototype.size = function(x, speed) {
       var borderWidth, that;
+      if (speed == null) {
+        speed = 0;
+      }
       that = this.item;
       borderWidth = 1 + x / 10;
-      that.css("width", x).css("height", x).css("border-radius", x).css("border-width", borderWidth).css("margin", -x);
+      that.animate({
+        "width": x,
+        "height": x,
+        "border-radius": x,
+        "border-width": borderWidth,
+        "margin": -x
+      }, speed);
       that.children(".pupil").css("width", x / 2).css("height", x / 2).css("border-radius", x / 2);
       return this;
     };
 
-    Eye.prototype.position = function(left, top) {
+    Eye.prototype.position = function(left, top, speed) {
       var that;
+      if (speed == null) {
+        speed = 0;
+      }
       that = this.item;
-      that.css("left", left).css("top", top);
+      that.animate({
+        "left": left,
+        "top": top
+      }, speed);
       return this;
     };
 

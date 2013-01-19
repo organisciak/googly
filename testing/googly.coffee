@@ -39,18 +39,22 @@ class Eye
 				googly_storage.add (new Eye $("body") )
 			.append(p)
 			.prependTo(@parent)
-		this.size(40).position(40,40)
+		this.position(40, 40).size(40)
 		console.log 'added eye'
 		
-	size: (x) ->
+	size: (x, speed = 0) ->
 		that = this.item
 		borderWidth = 1 + x/10
 		that
-			.css("width", x)
-			.css("height", x)
-			.css("border-radius", x)
-			.css("border-width", borderWidth)
-			.css("margin", -x)
+			.animate({
+					"width": x
+					"height": x
+					"border-radius": x
+					"border-width": borderWidth
+					"margin" : -x
+					},
+					speed
+			)
 		
 		#Pupil Sizing	
 		that.children(".pupil")
@@ -61,11 +65,14 @@ class Eye
 		#Inverse margins so element doesn't take up any space in parent
 		this
 
-	position: (left, top) ->
+	position: (left, top, speed = 0) ->
 		that = this.item
 		that
-			.css("left", left)
-			.css("top", top)
+			.animate({
+			"left":left
+			"top": top
+			},
+			speed)
 		this
 		
 	export: ->
