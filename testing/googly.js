@@ -38,9 +38,22 @@
 
   Eye = (function() {
 
+    Eye.prototype._properties = {
+      size: 40,
+      eye: {
+        left: 40,
+        top: 40
+      },
+      pupil: {
+        left: 0,
+        top: 0
+      }
+    };
+
     function Eye(parent) {
       var p, that;
       this.parent = parent;
+      console.log(this._properties.eye.top);
       that = this;
       this.item = $("<div class='eye'>");
       p = $("<div class='pupil'>");
@@ -60,8 +73,9 @@
       }).dblclick(function(e) {
         return googly_storage.add(new Eye($("body")));
       }).append(p).prependTo(this.parent);
-      this.position(40, 40).size(40);
+      this.position(this._properties.eye.left, this._properties.eye.top).size(this._properties.size);
       console.log('added eye');
+      console.log(this._properties.eye.top);
     }
 
     Eye.prototype.size = function(x, speed) {
@@ -69,6 +83,7 @@
       if (speed == null) {
         speed = 0;
       }
+      this._properties.size = x;
       that = this.item;
       borderWidth = 1 + x / 10;
       that.animate({
@@ -87,6 +102,8 @@
       if (speed == null) {
         speed = 0;
       }
+      this._properties.eye.left = left;
+      this._properties.eye.top = top;
       that = this.item;
       that.animate({
         "left": left,
@@ -98,22 +115,7 @@
     Eye.prototype["export"] = function() {
       /* Return object representation of this eye's data
       */
-
-      var a, eye, pupil;
-      eye = this.item;
-      pupil = eye.children(".pupil");
-      a = {
-        size: eye.width(),
-        eye: {
-          left: eye.css("left"),
-          top: eye.css("top")
-        },
-        pupil: {
-          left: pupil.css("margin-left"),
-          top: pupil.css("margin-top")
-        }
-      };
-      return a;
+      return this._properties;
     };
 
     Eye.prototype.pupil = function(left, top, speed) {
@@ -121,23 +123,21 @@
       if (speed == null) {
         speed = 300;
       }
-      /* Takes a number from 0 to 1, referring 
+      /* Pupil position
+      		Takes a number from 0 to 1, referring 
       		to the left to right and top to bottom position
       		of the pupil
       */
 
+      this._properties.pupil.left = left;
+      this._properties.pupil.top = top;
       that = this.item;
       psizeDiff = that.innerWidth() - that.children(".pupil").outerWidth();
-      return that.children(".pupil").animate({
+      that.children(".pupil").animate({
         "margin-left": psizeDiff * left,
         "margin-top": psizeDiff * top
       }, speed);
-      /*
-      		that.children(".pupil")
-      			.css("margin-left", left)
-      			.css("margin-top", top)
-      */
-
+      return this;
     };
 
     return Eye;
@@ -178,9 +178,7 @@
         eye = eye_data[_i];
         console.log(eye);
         t = new Eye($("body"));
-        t.size(eye.size);
-        t.position(eye.eye.left, eye.eye.top);
-        t.pupil(eye.pupil.left, eye.pupil.top, 0);
+        t.size(eye.size).position(eye.eye.left, eye.eye.top).pupil(eye.pupil.left, eye.pupil.top, 0);
         this.add(t);
       }
     };

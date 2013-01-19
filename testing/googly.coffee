@@ -20,11 +20,21 @@ trash = new Trash
 ### Create Eyeball ###
 
 class Eye
+	_properties:
+		size: 40
+		eye:
+			left: 40
+			top: 40
+		pupil:
+			left: 0
+			top: 0
+
 	constructor: (@parent) ->
+		console.log @_properties.eye.top
 		that = this
-		this.item = $("<div class='eye'>")
+		@item = $("<div class='eye'>")
 		p = $("<div class='pupil'>")
-		this.item
+		@item
 			.draggable({
 				stack:	'.eye'
 				#snap: '.trash'
@@ -39,11 +49,15 @@ class Eye
 				googly_storage.add (new Eye $("body") )
 			.append(p)
 			.prependTo(@parent)
-		this.position(40, 40).size(40)
+		this
+			.position(@_properties.eye.left, @_properties.eye.top)
+			.size(@_properties.size)
 		console.log 'added eye'
+		console.log @_properties.eye.top
 		
 	size: (x, speed = 0) ->
-		that = this.item
+		@_properties.size = x
+		that = @item
 		borderWidth = 1 + x/10
 		that
 			.animate({
@@ -63,41 +77,32 @@ class Eye
 			.css("border-radius", x/2)
 			
 		#Inverse margins so element doesn't take up any space in parent
-		this
+		@
 
 	position: (left, top, speed = 0) ->
-		that = this.item
+		@_properties.eye.left = left
+		@_properties.eye.top = top
+		that = @item
 		that
 			.animate({
 			"left":left
 			"top": top
 			},
 			speed)
-		this
+		@
 		
 	export: ->
 		### Return object representation of this eye's data ###
-		eye = this.item
-		pupil = eye.children(".pupil")
-		a = {
-			size: eye.width(),
-			eye: {
-				left: eye.css("left"),
-				top: eye.css("top")
-			},
-			pupil: {
-				left: pupil.css("margin-left"),
-				top: pupil.css("margin-top")
-			}
-		}
-		a
-	
+		@_properties
 	
 	pupil: (left, top, speed = 300) ->
-		### Takes a number from 0 to 1, referring 
+		### Pupil position
+		Takes a number from 0 to 1, referring 
 		to the left to right and top to bottom position
 		of the pupil
 		###
+		@_properties.pupil.left = left
+		@_properties.pupil.top = top
 		that = this.item
 		psizeDiff = that.innerWidth()-that.children(".pupil").outerWidth()
 		that.children(".pupil")
@@ -107,11 +112,7 @@ class Eye
 					},
 					speed
 				)
-		###
-		that.children(".pupil")
-			.css("margin-left", left)
-			.css("margin-top", top)
-		###
+		@
 		
 ### Constancy functions ###
 class Storage
@@ -127,9 +128,10 @@ class Storage
 		for eye in eye_data
 			console.log eye
 			t = new Eye $("body")
-			t.size(eye.size)
-			t.position(eye.eye.left, eye.eye.top)
-			t.pupil(eye.pupil.left, eye.pupil.top, 0)
+			t
+				.size(eye.size)
+				.position(eye.eye.left, eye.eye.top)
+				.pupil(eye.pupil.left, eye.pupil.top, 0)
 			this.add t
 		return
 		
