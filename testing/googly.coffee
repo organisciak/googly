@@ -20,16 +20,15 @@ trash = new Trash
 ### Create Eyeball ###
 
 class Eye
-	_properties:
-		size: 40
-		eye:
-			left: 40
-			top: 40
-		pupil:
-			left: 0
-			top: 0
-
 	constructor: (@parent) ->
+		@_properties = 
+			size: 40
+			eye:
+				left: 40
+				top: 40
+			pupil:
+				left: 0
+				top: 0
 		that = this
 		@item = $("<div class='eye'>")
 		p = $("<div class='pupil'>")
@@ -63,7 +62,7 @@ class Eye
 		console.log 'added eye'
 		console.log @_properties
 		
-	size: (x, speed = 0) ->
+	size: (x, speed = 0) =>
 		@_properties.size = x
 		that = @item
 		borderWidth = 1 + x/10
@@ -90,7 +89,7 @@ class Eye
 		#Inverse margins so element doesn't take up any space in parent
 		@
 
-	position: (left, top, speed = 0) ->
+	position: (left, top, speed = 0) =>
 		[@_properties.eye.left,@_properties.eye.top] = [left, top]
 		that = @item
 		that
@@ -105,7 +104,7 @@ class Eye
 		### Return object representation of this eye's data ###
 		@_properties
 	
-	pupil: (left, top, speed = 300) ->
+	pupil: (left, top, speed = 300) =>
 		### Pupil position
 		Takes a number from 0 to 1, referring 
 		to the left to right and top to bottom position
