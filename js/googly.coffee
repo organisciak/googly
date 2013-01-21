@@ -3,15 +3,21 @@ $ = jQuery
 ### Create Trash ###
 class Trash
 	draw: ->
-		$("<div class='trash'>")
+		t = $("<div class='trash'>")
+		t
 			.html("This is the trash")
 			.hide()
 			.prependTo("body")
-
+			
+		@element = t
 	show: ->
-		$(".trash").slideDown("fast")
+		@element.slideDown("fast")
 	hide: ->
-		$(".trash").slideUp()
+		@element.slideUp()
+	borders: ->
+		{top:top, left:left} = @element.position()
+		[bottom, right] = [top+@element.height(), left+@element.width()]
+		{"top":top, "left":left, "bottom":bottom, "right":right}
 	delete: ->
 		return
 
@@ -38,18 +44,31 @@ class Eye
 				autoHide: true
 				aspectRatio: true
 				resize: ( event, ui ) ->
-					console.log ui
 					that.size ui.size.width
 				handles: "ne, se, sw, nw"
+				stop: (event, ui ) ->
+					googly_storage.save()
 			})
 			.draggable({
 				stack:	'.eye'
 				#snap: '.trash'
 				snapMode: 'inner'
 				start: -> trash.show()
+				drag: (event, ui) ->
+					#Check for overlap with trash
+					t_bord = trash.borders()
+					if (t_bord.top < ui.position.top < t_bord.bottom) and (t_bord.left < ui.position.left < t_bord.right)
+						console.log("Delete?")
+						$(this).css("opacity", 0.6)
+					else
+						$(this).css("opacity", 1)
 				stop: (event, ui) -> 
-					trash.hide()
+					t_bord = trash.borders()
+					if (t_bord.top < ui.position.top < t_bord.bottom) and (t_bord.left < ui.position.left < t_bord.right)
+						that.delete()
+					#trash.hide()
 					{top:that._properties.eye.top, left:that._properties.eye.left} = ui.position
+					googly_storage.save()
 				})
 			.click (e) ->
 				esize = $(this).outerWidth()
@@ -63,8 +82,10 @@ class Eye
 			.position(@_properties.eye.left, @_properties.eye.top)
 			.size(@_properties.size)
 		console.log 'added eye'
-		console.log @_properties
 		
+	delete: =>
+		console.log "Delete me!"
+	
 	size: (x, speed = 0) =>
 		@_properties.size = x
 		that = @item
@@ -136,14 +157,28 @@ class Eye
 ### Constancy functions ###
 class Storage
 	constructor: (@list =[]) ->
+		@key = window.location.href
 	
 	add: (item) ->
 		@list.push(item)
 		
 	save: () ->
-		console.log (eye.export() for eye in @list)
+		data = (eye.export() for eye in @list)
+		@save_local(data)
 		
-	load: (eye_data) ->
+	save_local: (data) ->
+		str = JSON.stringify data
+		localStorage.setItem(@key, str)
+		console.log "Saved localStorage key for #{@key}:#{str}"
+	
+	load_local: ->
+		str = localStorage.getItem(@key)
+		JSON.parse str
+		
+	load: (eye_data = false) ->
+		if not eye_data
+			eye_data = @load_local()
+			console.log "Loaded localStorage key for #{@key}"
 		for eye in eye_data
 			console.log eye
 			t = new Eye $("body")
@@ -161,7 +196,6 @@ $ ->
 	trash.draw()
 	window.googly_storage = new Storage
 	storage = googly_storage
-	storage.add new Eye($("body"))
 	
 	a = [{
 		size: 60
@@ -188,6 +222,5 @@ $ ->
 	}
 	]
 	
-	storage.load a
+	storage.load()
 	console.log storage.list
-	storage.save()

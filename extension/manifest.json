@@ -1,0 +1,16 @@
+{
+"name": "Googly Eyes",
+	"version": "0.01",
+	"manifest_version": 2,
+	"description": "Add silly googly eyes to web pages",
+	//"icons": { "16": "images/icon16.png",
+	//             "48": "images/icon48.png",
+	//            "128": "images/icon128.png" },
+	//"background": {
+	//	"scripts": ["count.js"]
+	//},
+	//"offline_enabled": true,
+	//"permissions" : [
+	//	"contextMenus", "tabs", "http://*/*", "https://*/*"
+	//]
+}

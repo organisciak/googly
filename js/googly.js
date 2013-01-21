@@ -14,15 +14,30 @@
     function Trash() {}
 
     Trash.prototype.draw = function() {
-      return $("<div class='trash'>").html("This is the trash").hide().prependTo("body");
+      var t;
+      t = $("<div class='trash'>");
+      t.html("This is the trash").hide().prependTo("body");
+      return this.element = t;
     };
 
     Trash.prototype.show = function() {
-      return $(".trash").slideDown("fast");
+      return this.element.slideDown("fast");
     };
 
     Trash.prototype.hide = function() {
-      return $(".trash").slideUp();
+      return this.element.slideUp();
+    };
+
+    Trash.prototype.borders = function() {
+      var bottom, left, right, top, _ref, _ref1;
+      _ref = this.element.position(), top = _ref.top, left = _ref.left;
+      _ref1 = [top + this.element.height(), left + this.element.width()], bottom = _ref1[0], right = _ref1[1];
+      return {
+        "top": top,
+        "left": left,
+        "bottom": bottom,
+        "right": right
+      };
     };
 
     Trash.prototype["delete"] = function() {};
@@ -48,6 +63,8 @@
 
       this.size = __bind(this.size, this);
 
+      this["delete"] = __bind(this["delete"], this);
+
       this._properties = {
         size: 40,
         eye: {
@@ -66,20 +83,36 @@
         autoHide: true,
         aspectRatio: true,
         resize: function(event, ui) {
-          console.log(ui);
           return that.size(ui.size.width);
         },
-        handles: "ne, se, sw, nw"
+        handles: "ne, se, sw, nw",
+        stop: function(event, ui) {
+          return googly_storage.save();
+        }
       }).draggable({
         stack: '.eye',
         snapMode: 'inner',
         start: function() {
           return trash.show();
         },
+        drag: function(event, ui) {
+          var t_bord, _ref, _ref1;
+          t_bord = trash.borders();
+          if (((t_bord.top < (_ref = ui.position.top) && _ref < t_bord.bottom)) && ((t_bord.left < (_ref1 = ui.position.left) && _ref1 < t_bord.right))) {
+            console.log("Delete?");
+            return $(this).css("opacity", 0.6);
+          } else {
+            return $(this).css("opacity", 1);
+          }
+        },
         stop: function(event, ui) {
-          var _ref;
-          trash.hide();
-          return _ref = ui.position, that._properties.eye.top = _ref.top, that._properties.eye.left = _ref.left, _ref;
+          var t_bord, _ref, _ref1, _ref2;
+          t_bord = trash.borders();
+          if (((t_bord.top < (_ref = ui.position.top) && _ref < t_bord.bottom)) && ((t_bord.left < (_ref1 = ui.position.left) && _ref1 < t_bord.right))) {
+            that["delete"]();
+          }
+          _ref2 = ui.position, that._properties.eye.top = _ref2.top, that._properties.eye.left = _ref2.left;
+          return googly_storage.save();
         }
       }).click(function(e) {
         var esize;
@@ -90,8 +123,11 @@
       }).append(p).prependTo(this.parent);
       this.position(this._properties.eye.left, this._properties.eye.top).size(this._properties.size);
       console.log('added eye');
-      console.log(this._properties);
     }
+
+    Eye.prototype["delete"] = function() {
+      return console.log("Delete me!");
+    };
 
     Eye.prototype.size = function(x, speed) {
       var borderWidth, that;
@@ -173,6 +209,7 @@
 
     function Storage(list) {
       this.list = list != null ? list : [];
+      this.key = window.location.href;
     }
 
     Storage.prototype.add = function(item) {
@@ -180,8 +217,8 @@
     };
 
     Storage.prototype.save = function() {
-      var eye;
-      return console.log((function() {
+      var data, eye;
+      data = (function() {
         var _i, _len, _ref, _results;
         _ref = this.list;
         _results = [];
@@ -190,11 +227,32 @@
           _results.push(eye["export"]());
         }
         return _results;
-      }).call(this));
+      }).call(this);
+      return this.save_local(data);
+    };
+
+    Storage.prototype.save_local = function(data) {
+      var str;
+      str = JSON.stringify(data);
+      localStorage.setItem(this.key, str);
+      return console.log("Saved localStorage key for " + this.key + ":" + str);
+    };
+
+    Storage.prototype.load_local = function() {
+      var str;
+      str = localStorage.getItem(this.key);
+      return JSON.parse(str);
     };
 
     Storage.prototype.load = function(eye_data) {
       var eye, t, _i, _len;
+      if (eye_data == null) {
+        eye_data = false;
+      }
+      if (!eye_data) {
+        eye_data = this.load_local();
+        console.log("Loaded localStorage key for " + this.key);
+      }
       for (_i = 0, _len = eye_data.length; _i < _len; _i++) {
         eye = eye_data[_i];
         console.log(eye);
@@ -215,7 +273,6 @@
     trash.draw();
     window.googly_storage = new Storage;
     storage = googly_storage;
-    storage.add(new Eye($("body")));
     a = [
       {
         size: 60,
@@ -241,9 +298,8 @@
         }
       }
     ];
-    storage.load(a);
-    console.log(storage.list);
-    return storage.save();
+    storage.load();
+    return console.log(storage.list);
   });
 
 }).call(this);
