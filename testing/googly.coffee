@@ -30,11 +30,17 @@ class Eye
 			top: 0
 
 	constructor: (@parent) ->
-		console.log @_properties.eye.top
 		that = this
 		@item = $("<div class='eye'>")
 		p = $("<div class='pupil'>")
 		@item
+			.resizable({ 
+				autoHide: true
+				aspectRatio: true
+				resize: ( event, ui ) ->
+					that.size ui.size.width
+				handles: "ne, se, sw, nw"
+			})
 			.draggable({
 				stack:	'.eye'
 				#snap: '.trash'
@@ -46,14 +52,14 @@ class Eye
 				esize = $(this).outerWidth()
 				that.pupil(e.offsetX/esize, e.offsetY/esize)
 			.dblclick (e) ->
-				googly_storage.add (new Eye $("body") )
+				googly_storage.add new Eye $("body")
 			.append(p)
 			.prependTo(@parent)
 		this
 			.position(@_properties.eye.left, @_properties.eye.top)
 			.size(@_properties.size)
 		console.log 'added eye'
-		console.log @_properties.eye.top
+		console.log @_properties
 		
 	size: (x, speed = 0) ->
 		@_properties.size = x
@@ -75,6 +81,9 @@ class Eye
 			.css("width", x/2)
 			.css("height", x/2)
 			.css("border-radius", x/2)
+		
+		#Pupil position
+		@pupil(@_properties.pupil.left, @_properties.pupil.top, 0)
 			
 		#Inverse margins so element doesn't take up any space in parent
 		@
@@ -160,7 +169,7 @@ $ ->
 		eye: {
 			zIndex:3
 			left:30
-			top:0
+			top:60
 		}
 		pupil: {
 			left:0.5

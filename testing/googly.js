@@ -53,11 +53,17 @@
     function Eye(parent) {
       var p, that;
       this.parent = parent;
-      console.log(this._properties.eye.top);
       that = this;
       this.item = $("<div class='eye'>");
       p = $("<div class='pupil'>");
-      this.item.draggable({
+      this.item.resizable({
+        autoHide: true,
+        aspectRatio: true,
+        resize: function(event, ui) {
+          return that.size(ui.size.width);
+        },
+        handles: "ne, se, sw, nw"
+      }).draggable({
         stack: '.eye',
         snapMode: 'inner',
         start: function() {
@@ -75,7 +81,7 @@
       }).append(p).prependTo(this.parent);
       this.position(this._properties.eye.left, this._properties.eye.top).size(this._properties.size);
       console.log('added eye');
-      console.log(this._properties.eye.top);
+      console.log(this._properties);
     }
 
     Eye.prototype.size = function(x, speed) {
@@ -94,6 +100,7 @@
         "margin": -x
       }, speed);
       that.children(".pupil").css("width", x / 2).css("height", x / 2).css("border-radius", x / 2);
+      this.pupil(this._properties.pupil.left, this._properties.pupil.top, 0);
       return this;
     };
 
@@ -212,7 +219,7 @@
         eye: {
           zIndex: 3,
           left: 30,
-          top: 0
+          top: 60
         },
         pupil: {
           left: 0.5,
