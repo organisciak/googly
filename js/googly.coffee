@@ -66,8 +66,9 @@ class Eye
 					t_bord = trash.borders()
 					if (t_bord.top < ui.position.top < t_bord.bottom) and (t_bord.left < ui.position.left < t_bord.right)
 						that.delete()
-					#trash.hide()
-					{top:that._properties.eye.top, left:that._properties.eye.left} = ui.position
+					else
+						{top:that._properties.eye.top, left:that._properties.eye.left} = ui.position
+					trash.hide()
 					googly_storage.save()
 				})
 			.click (e) ->

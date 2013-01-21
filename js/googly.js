@@ -110,8 +110,10 @@
           t_bord = trash.borders();
           if (((t_bord.top < (_ref = ui.position.top) && _ref < t_bord.bottom)) && ((t_bord.left < (_ref1 = ui.position.left) && _ref1 < t_bord.right))) {
             that["delete"]();
+          } else {
+            _ref2 = ui.position, that._properties.eye.top = _ref2.top, that._properties.eye.left = _ref2.left;
           }
-          _ref2 = ui.position, that._properties.eye.top = _ref2.top, that._properties.eye.left = _ref2.left;
+          trash.hide();
           return googly_storage.save();
         }
       }).click(function(e) {
