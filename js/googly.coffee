@@ -31,12 +31,14 @@ class Eye
 				top: 0
 		that = this
 		@item = $("<div class='eye'>")
+		#b = $("<div class='bounding-box'>")
 		p = $("<div class='pupil'>")
 		@item
 			.resizable({ 
 				autoHide: true
 				aspectRatio: true
 				resize: ( event, ui ) ->
+					console.log ui
 					that.size ui.size.width
 				handles: "ne, se, sw, nw"
 			})
@@ -54,6 +56,7 @@ class Eye
 				that.pupil(e.offsetX/esize, e.offsetY/esize)
 			.dblclick (e) ->
 				googly_storage.add new Eye $("body")
+			#.append(b)
 			.append(p)
 			.prependTo(@parent)
 		this
@@ -79,12 +82,19 @@ class Eye
 		
 		#Pupil Sizing	
 		that.children(".pupil")
-			.css("width", x/2)
-			.css("height", x/2)
-			.css("border-radius", x/2)
+			.css("width", x*2/3)
+			.css("height", x*2/3)
+			.css("border-radius", x*2/3)
 		
 		#Pupil position
 		@pupil(@_properties.pupil.left, @_properties.pupil.top, 0)
+		
+		#Bounding box Size
+		###that.children(".bounding-box")
+			.css("width", that.innerWidth() )
+			.css("height", that.innerWidth() )
+			.css("top", -borderWidth/2)
+			.css("left", -borderWidth/2)###
 			
 		#Inverse margins so element doesn't take up any space in parent
 		@

@@ -66,6 +66,7 @@
         autoHide: true,
         aspectRatio: true,
         resize: function(event, ui) {
+          console.log(ui);
           return that.size(ui.size.width);
         },
         handles: "ne, se, sw, nw"
@@ -107,8 +108,15 @@
         "border-width": borderWidth,
         "margin": -x
       }, speed);
-      that.children(".pupil").css("width", x / 2).css("height", x / 2).css("border-radius", x / 2);
+      that.children(".pupil").css("width", x * 2 / 3).css("height", x * 2 / 3).css("border-radius", x * 2 / 3);
       this.pupil(this._properties.pupil.left, this._properties.pupil.top, 0);
+      /*that.children(".bounding-box")
+      			.css("width", that.innerWidth() )
+      			.css("height", that.innerWidth() )
+      			.css("top", -borderWidth/2)
+      			.css("left", -borderWidth/2)
+      */
+
       return this;
     };
 

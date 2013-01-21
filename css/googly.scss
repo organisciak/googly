@@ -16,9 +16,15 @@ $pupil-size: $eye-size * 0.75 - 10; //10px removed for pupil border
 		width: $pupil-size;
 		height: $pupil-size;
 		border-radius:$pupil-size;
-		border: 5px solid black;
+		//border: 5px solid black;
 		&.down { margin-top: $eye-size - $pupil-size }
 		&.right { margin-left:$eye-size - $pupil-size }
+	}
+	.bounding-box {
+		border: 3px dashed tomato;
+		width: 100%;
+		height: 100%;
+		position: absolute;
 	}
 }
 
