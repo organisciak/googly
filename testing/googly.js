@@ -69,8 +69,10 @@
         start: function() {
           return trash.show();
         },
-        stop: function() {
-          return trash.hide();
+        stop: function(event, ui) {
+          var _ref;
+          trash.hide();
+          return _ref = ui.position, that._properties.eye.top = _ref.top, that._properties.eye.left = _ref.left, _ref;
         }
       }).click(function(e) {
         var esize;
@@ -105,12 +107,11 @@
     };
 
     Eye.prototype.position = function(left, top, speed) {
-      var that;
+      var that, _ref;
       if (speed == null) {
         speed = 0;
       }
-      this._properties.eye.left = left;
-      this._properties.eye.top = top;
+      _ref = [left, top], this._properties.eye.left = _ref[0], this._properties.eye.top = _ref[1];
       that = this.item;
       that.animate({
         "left": left,
@@ -126,7 +127,7 @@
     };
 
     Eye.prototype.pupil = function(left, top, speed) {
-      var psizeDiff, that;
+      var psizeDiff, that, _ref;
       if (speed == null) {
         speed = 300;
       }
@@ -136,8 +137,7 @@
       		of the pupil
       */
 
-      this._properties.pupil.left = left;
-      this._properties.pupil.top = top;
+      _ref = [left, top], this._properties.pupil.left = _ref[0], this._properties.pupil.top = _ref[1];
       that = this.item;
       psizeDiff = that.innerWidth() - that.children(".pupil").outerWidth();
       that.children(".pupil").animate({

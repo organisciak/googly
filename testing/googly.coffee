@@ -46,7 +46,9 @@ class Eye
 				#snap: '.trash'
 				snapMode: 'inner'
 				start: -> trash.show()
-				stop: -> trash.hide()
+				stop: (event, ui) -> 
+					trash.hide()
+					{top:that._properties.eye.top, left:that._properties.eye.left} = ui.position
 				})
 			.click (e) ->
 				esize = $(this).outerWidth()
@@ -89,8 +91,7 @@ class Eye
 		@
 
 	position: (left, top, speed = 0) ->
-		@_properties.eye.left = left
-		@_properties.eye.top = top
+		[@_properties.eye.left,@_properties.eye.top] = [left, top]
 		that = @item
 		that
 			.animate({
@@ -110,14 +111,14 @@ class Eye
 		to the left to right and top to bottom position
 		of the pupil
 		###
-		@_properties.pupil.left = left
-		@_properties.pupil.top = top
+		[@_properties.pupil.left,@_properties.pupil.top] = [left, top]
 		that = this.item
 		psizeDiff = that.innerWidth()-that.children(".pupil").outerWidth()
 		that.children(".pupil")
 			.animate(
-					{"margin-left":psizeDiff*left,
-					"margin-top":psizeDiff*top
+					{
+					"margin-left": psizeDiff*left
+					"margin-top": psizeDiff*top
 					},
 					speed
 				)
