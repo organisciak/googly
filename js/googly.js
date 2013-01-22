@@ -270,8 +270,11 @@
 
   })();
 
+  console.log("script loaded");
+
   $(function() {
     var a, storage;
+    console.log("JQuery loaded");
     trash.draw();
     window.googly_storage = new Storage;
     storage = googly_storage;
@@ -300,7 +303,7 @@
         }
       }
     ];
-    storage.load();
+    storage.load(a);
     return console.log(storage.list);
   });
 

@@ -4,7 +4,7 @@
 	"manifest_version": 2,
 	"description": "Add silly googly eyes to web pages",
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["js/background.js"]
 	},
 	"browser_action": {
 		"name": "Add eyes to page!",

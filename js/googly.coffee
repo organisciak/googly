@@ -192,8 +192,10 @@ class Storage
 		
 	delete: ->
 		return
-		
+
+console.log("script loaded")		
 $ ->
+	console.log("JQuery loaded")
 	trash.draw()
 	window.googly_storage = new Storage
 	storage = googly_storage
@@ -223,5 +225,5 @@ $ ->
 	}
 	]
 	
-	storage.load()
+	storage.load(a)
 	console.log storage.list

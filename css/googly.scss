@@ -1,3 +1,5 @@
+@import 'jquery-ui';
+
 $eye-size: 40px;
 $pupil-size: $eye-size * 0.75 - 10; //10px removed for pupil border
 .eye {
@@ -11,6 +13,7 @@ $pupil-size: $eye-size * 0.75 - 10; //10px removed for pupil border
 	margin: -$eye-size/2;
 	top: $eye-size/2;
 	left: $eye-size/2;
+	z-index: 1000;
 	.pupil {
 		background-color: black;
 		width: $pupil-size;
