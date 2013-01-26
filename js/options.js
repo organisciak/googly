@@ -56,11 +56,17 @@
     //Populate list of all saved data//
     var addDataItem = function(site, count) {
         var item = $("<li>");
+        var site_string = site;
+        if (site_string.length > 70) {
+            site_string = site_string.substring(0,70)+"..."
+        }
         $("<a href='#'><dl><dt>"
-                +site+"</dt><dd>"
+                +site_string+"</dt><dd>"
                 +count+" eye"+ (count===1 ? "s":"")
                 +"</dd></dl></a>"
             )
+            .appendTo(item);
+        $("<a class='action' src='"+site+"'>Visit site</a>")
             .appendTo(item);
         $("<a href='#' class='delete'>delete</a>")
             .click(function(){

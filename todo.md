@@ -8,6 +8,7 @@
 * Watch pages and alert when there is data for a page
  * Change the icon color instead of alerting
 * Option for auto-load data when already save
+* Hover option to share a site's eyes from the data page
 
 #Fixed
 
