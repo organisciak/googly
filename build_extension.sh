@@ -41,6 +41,10 @@ echo "Compiling SCSS to CSS..."
 mkdir -p extension/css/images
 sass --style compressed css/googly.scss:extension/css/googly.css --style compressed
 
+echo "Moving Libraries for option page"
+cp css/chrome-bootstrap/chrome-bootstrap.css extension/css/
+cp js/lib/jquery-1.8.3.js extension/js/
+
 echo "Moving CSS files to extension folder..."
 rm -rf extension/css/images/*
 cp -r css/images/* extension/css/images
