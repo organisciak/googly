@@ -74,7 +74,15 @@
                 
        $("#site-data").append(item);
    }
-   
+    //Read all data and enumerate it
+    chrome.storage.local.get(null, function(data){
+        all = data;
+        for (var key in all) {
+            if (key.substring(0,4) === "http") {
+                addDataItem(key, all[key].length);
+            }
+        }
+    });
        
     //Add Storage alert
     chrome.storage.local.getBytesInUse(null, function(data){
@@ -85,13 +93,5 @@
             $(".storage-alert").remove();
         }
    });
-
-    //Read all data and enumerate it
-    chrome.storage.local.get(null, function(data){
-        all = data;
-        for (var key in all) {
-            addDataItem(key, all[key].length);
-            }
-    });
       
 });
