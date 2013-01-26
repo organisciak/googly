@@ -82,7 +82,6 @@ class Eye
 		this
 			.position(@_properties.eye.left, @_properties.eye.top)
 			.size(@_properties.size)
-		console.log 'added eye'
 		
 	delete: =>
 		console.log "Delete me!"
@@ -157,7 +156,7 @@ class Eye
 		
 ### Constancy functions ###
 class Storage
-	constructor: (@list =[]) ->
+	constructor: (@type, @list =[]) ->
 		@key = window.location.href
 	
 	add: (item) ->
@@ -165,21 +164,39 @@ class Storage
 		
 	save: () ->
 		data = (eye.export() for eye in @list)
-		@save_local(data)
-		
+		if @type is "local"
+			@save_local(data)
+		else if @type is "extension"
+			@save_extension(data)
+			
 	save_local: (data) ->
 		str = JSON.stringify data
 		localStorage.setItem(@key, str)
 		console.log "Saved localStorage key for #{@key}:#{str}"
 	
-	load_local: ->
-		str = localStorage.getItem(@key)
-		JSON.parse str
-		
+	save_extension: (data) ->
+		chrome.extension.sendMessage(
+			{task:"save", data:data}, 
+			(response) ->
+			  if response.status is 'success'
+			  	console.log 'Saved to extension storage successfully'
+		)
+
 	load: (eye_data = false) ->
 		if not eye_data
-			eye_data = @load_local()
-			console.log "Loaded localStorage key for #{@key}"
+			if @type is "local"
+				eye_data = @load_local()
+				@_draw(eye_data)
+				console.log "Loaded localStorage key for #{@key}"
+			else if @type is "extension"
+				@load_extension()
+		else
+			@_draw(eye_data)
+	
+	_draw: (eye_data) ->
+		if $.isEmptyObject(eye_data)
+			console.log "Eye data is empty. Drawing default"
+			eye_data = [{size:60,eye:{left:334,top:156},pupil:{left:1,top:1}}]
 		for eye in eye_data
 			console.log eye
 			t = new Eye $("body")
@@ -189,15 +206,26 @@ class Storage
 				.pupil(eye.pupil.left, eye.pupil.top, 0)
 			this.add t
 		return
+			
+	load_extension: (data) ->
+		chrome.extension.sendMessage(
+			{task:"load"}, 
+			(response) =>
+			  if response.status is "success"
+				  @_draw(response.data)
+			  
+		)
+	
+	load_local: ->
+		str = localStorage.getItem(@key)
+		JSON.parse str
 		
 	delete: ->
 		return
 
-console.log("script loaded")		
 $ ->
-	console.log("JQuery loaded")
 	trash.draw()
-	window.googly_storage = new Storage
+	window.googly_storage = new Storage("extension")
 	storage = googly_storage
 	
 	a = [{
@@ -225,5 +253,5 @@ $ ->
 	}
 	]
 	
-	storage.load(a)
-	console.log storage.list
+	storage.load(false)
+	storage.save()

@@ -124,7 +124,6 @@
         return googly_storage.add(new Eye($("body")));
       }).append(p).prependTo(this.parent);
       this.position(this._properties.eye.left, this._properties.eye.top).size(this._properties.size);
-      console.log('added eye');
     }
 
     Eye.prototype["delete"] = function() {
@@ -209,7 +208,8 @@
 
   Storage = (function() {
 
-    function Storage(list) {
+    function Storage(type, list) {
+      this.type = type;
       this.list = list != null ? list : [];
       this.key = window.location.href;
     }
@@ -230,7 +230,11 @@
         }
         return _results;
       }).call(this);
-      return this.save_local(data);
+      if (this.type === "local") {
+        return this.save_local(data);
+      } else if (this.type === "extension") {
+        return this.save_extension(data);
+      }
     };
 
     Storage.prototype.save_local = function(data) {
@@ -240,20 +244,51 @@
       return console.log("Saved localStorage key for " + this.key + ":" + str);
     };
 
-    Storage.prototype.load_local = function() {
-      var str;
-      str = localStorage.getItem(this.key);
-      return JSON.parse(str);
+    Storage.prototype.save_extension = function(data) {
+      return chrome.extension.sendMessage({
+        task: "save",
+        data: data
+      }, function(response) {
+        if (response.status === 'success') {
+          return console.log('Saved to extension storage successfully');
+        }
+      });
     };
 
     Storage.prototype.load = function(eye_data) {
-      var eye, t, _i, _len;
       if (eye_data == null) {
         eye_data = false;
       }
       if (!eye_data) {
-        eye_data = this.load_local();
-        console.log("Loaded localStorage key for " + this.key);
+        if (this.type === "local") {
+          eye_data = this.load_local();
+          this._draw(eye_data);
+          return console.log("Loaded localStorage key for " + this.key);
+        } else if (this.type === "extension") {
+          return this.load_extension();
+        }
+      } else {
+        return this._draw(eye_data);
+      }
+    };
+
+    Storage.prototype._draw = function(eye_data) {
+      var eye, t, _i, _len;
+      if ($.isEmptyObject(eye_data)) {
+        console.log("Eye data is empty. Drawing default");
+        eye_data = [
+          {
+            size: 60,
+            eye: {
+              left: 334,
+              top: 156
+            },
+            pupil: {
+              left: 1,
+              top: 1
+            }
+          }
+        ];
       }
       for (_i = 0, _len = eye_data.length; _i < _len; _i++) {
         eye = eye_data[_i];
@@ -264,19 +299,33 @@
       }
     };
 
+    Storage.prototype.load_extension = function(data) {
+      var _this = this;
+      return chrome.extension.sendMessage({
+        task: "load"
+      }, function(response) {
+        if (response.status === "success") {
+          return _this._draw(response.data);
+        }
+      });
+    };
+
+    Storage.prototype.load_local = function() {
+      var str;
+      str = localStorage.getItem(this.key);
+      return JSON.parse(str);
+    };
+
     Storage.prototype["delete"] = function() {};
 
     return Storage;
 
   })();
 
-  console.log("script loaded");
-
   $(function() {
     var a, storage;
-    console.log("JQuery loaded");
     trash.draw();
-    window.googly_storage = new Storage;
+    window.googly_storage = new Storage("extension");
     storage = googly_storage;
     a = [
       {
@@ -303,8 +352,8 @@
         }
       }
     ];
-    storage.load(a);
-    return console.log(storage.list);
+    storage.load(false);
+    return storage.save();
   });
 
 }).call(this);

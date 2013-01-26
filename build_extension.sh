@@ -39,7 +39,7 @@ java -jar lib/compiler-latest/compiler.jar --jscomp_off=suspiciousCode --js_outp
 
 echo "Compiling SCSS to CSS..."
 mkdir -p extension/css/images
-sass --style compressed css/googly.scss:extension/css/googly.css
+sass --style compressed css/googly.scss:extension/css/googly.css --style compressed
 
 echo "Moving CSS files to extension folder..."
 rm -rf extension/css/images/*
