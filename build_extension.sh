@@ -29,8 +29,9 @@ rm extension/manifest.json.bak
 echo "Compiling Coffeescript"
 coffee -c js/
 
-echo "Moving background.js"
+echo "Moving background.js and option.js"
 cp js/background.js extension/js/background.js
+cp js/options.js extension/js/options.js
 
 echo "Compiling Javascript files..."
 javascripts=(js/lib/jquery-1.8.3.js js/lib/jquery-ui-1.9.2.custom.js js/lib/json2.js js/googly.js)
