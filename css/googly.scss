@@ -39,6 +39,7 @@ $pupil-size: $eye-size * 0.75 - 10; //10px removed for pupil border
 	right: 10px;
 	background: rgba(255,0,0,0.4);
 	border-radius: 0 0 10px 10px;
+	z-index: 900;
 }
 
 #draggable { width: 150px; height: 150px; padding: 0.5em; }

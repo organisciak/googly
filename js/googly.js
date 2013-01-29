@@ -68,8 +68,8 @@
       this._properties = {
         size: 40,
         eye: {
-          left: 40,
-          top: 40
+          left: 40 + document.body.scrollLeft,
+          top: 40 + document.body.scrollTop
         },
         pupil: {
           left: 0,
@@ -90,7 +90,7 @@
           return googly_storage.save();
         }
       }).draggable({
-        stack: '.eye',
+        zIndex: 1200,
         snapMode: 'inner',
         start: function() {
           return trash.show();
@@ -148,10 +148,10 @@
       that.children(".pupil").css("width", x * 2 / 3).css("height", x * 2 / 3).css("border-radius", x * 2 / 3);
       this.pupil(this._properties.pupil.left, this._properties.pupil.top, 0);
       /*that.children(".bounding-box")
-      			.css("width", that.innerWidth() )
-      			.css("height", that.innerWidth() )
-      			.css("top", -borderWidth/2)
-      			.css("left", -borderWidth/2)
+          .css("width", that.innerWidth() )
+          .css("height", that.innerWidth() )
+          .css("top", -borderWidth/2)
+          .css("left", -borderWidth/2)
       */
 
       return this;
@@ -183,9 +183,9 @@
         speed = 300;
       }
       /* Pupil position
-      		Takes a number from 0 to 1, referring 
-      		to the left to right and top to bottom position
-      		of the pupil
+      Takes a number from 0 to 1, referring 
+      to the left to right and top to bottom position
+      of the pupil
       */
 
       _ref = [left, top], this._properties.pupil.left = _ref[0], this._properties.pupil.top = _ref[1];
@@ -276,19 +276,8 @@
       var eye, t, _i, _len;
       if ($.isEmptyObject(eye_data)) {
         console.log("Eye data is empty. Drawing default");
-        eye_data = [
-          {
-            size: 60,
-            eye: {
-              left: 334,
-              top: 156
-            },
-            pupil: {
-              left: 1,
-              top: 1
-            }
-          }
-        ];
+        t = new Eye($("body"));
+        this.add(t);
       }
       for (_i = 0, _len = eye_data.length; _i < _len; _i++) {
         eye = eye_data[_i];
@@ -354,6 +343,16 @@
     ];
     storage.load(false);
     return storage.save();
+  });
+
+  chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.type === "new_eye") {
+      googly_storage.add(new Eye($("body")));
+      return sendResponse({
+        status: "success",
+        action: "add eye"
+      });
+    }
   });
 
 }).call(this);
