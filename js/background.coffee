@@ -1,18 +1,18 @@
-new_eye_or_load = (tabid = null) ->
-	resp = null
-	try
-		chrome.tabs.sendMessage(tabid, {type: "new_eye"}, (response) ->
-			resp = response
-			console.log "Message response"
-			console.log response 
-			if typeof(response) is "undefined"
-				loadEyes(tabid)
-			else if response.status is "success"
-				console.log "Successfully performed: #{response.action}"
-		)
-	catch error
-		console.log err
-	
+callScriptOrLoad = (tabid = null, request_type="exists") ->
+    resp = null
+    try
+        chrome.tabs.sendMessage(tabid, {type: request_type}, (response) ->
+            resp = response
+            console.log "Message response"
+            console.log response 
+            if typeof(response) is "undefined"
+                loadEyes(tabid)
+            else if response.status is "success"
+                console.log "Successfully performed: #{response.action}"
+        )
+    catch error
+        console.log err
+    
 loadEyes = (tabid = null) ->
     chrome.tabs.insertCSS(
         tabid
@@ -22,16 +22,16 @@ loadEyes = (tabid = null) ->
         tabid, 
         {file: "js/inject.js"},
         () ->
-        	console.log "Sending test message to #{tabid}"
-        	return true
+            console.log "Sending test message to #{tabid}"
+            return true
         )
 
 #Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener( (tab) ->
-	#Find current tab id
-	chrome.tabs.query({active:true,currentWindow:true}, (tabs) ->
-		for tab in tabs
-	        new_eye_or_load(tab.id)
+    #Find current tab id
+    chrome.tabs.query({active:true,currentWindow:true}, (tabs) ->
+        for tab in tabs
+            callScriptOrLoad(tab.id, "add")
     )
 )
     
@@ -39,12 +39,13 @@ chrome.browserAction.onClicked.addListener( (tab) ->
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) ->
     #Check if data exists for url
     chrome.storage.local.get(tab.url, (data) ->
-    	if typeof(data[tab.url]) isnt "undefined" and data[tab.url].length isnt 0
-    		console.log "There's data for #{tab.url}!"
-			## Either Alert with page action...
-			## ...
-			## Or auto-load
-    	)
+        if typeof(data[tab.url]) isnt "undefined" and data[tab.url].length isnt 0
+            console.log "There's data for #{tab.url}!"
+            ## Either Alert with page action...
+            ## ...
+            ## Or auto-load
+            callScriptOrLoad(tab.id)
+        )
     return true
 )
 
@@ -72,4 +73,4 @@ chrome.extension.onMessage.addListener( (request, sender, sendResponse) ->
                 return true
         )
     return true
-  );
+  )

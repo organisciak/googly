@@ -1,18 +1,19 @@
-# Bugs
-* Don't allow multiple loads. On first load inject script, on subsequent loads the button simply adds a new eyeball.
-* 
+# Bugs 
+* If you load data and then don't touch the eye, the data is deleted
 
 # Features
-* Settings page
- * <select> to review all saved pages, quick delete information
-* Watch pages and alert when there is data for a page
- * Change the icon color instead of alerting
+* When eye data is available, change the icon color instead of alerting
 * Option for auto-load data when already save
 * Hover option to share a site's eyes from the data page
 
 #Fixed
+* Don't allow multiple loads. On first load inject script, on subsequent loads the button simply adds a new eyeball.
 
 #Done
 * New eyes appear at top of window, not at the top of the page
 * Functionality to delete eyes
 * Functionality to delete all data for a page
+* Watch pages and alert when there is data for a page
+* <select> to review all saved pages, quick delete information
+* Settings page
+* Auto-load eye data when exists

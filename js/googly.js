@@ -346,11 +346,16 @@
   });
 
   chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.type === "new_eye") {
+    if (request.type === "add") {
       googly_storage.add(new Eye($("body")));
       return sendResponse({
         status: "success",
         action: "add eye"
+      });
+    } else if (request.type === "exists") {
+      return sendResponse({
+        status: "success",
+        action: "check script injection"
       });
     }
   });

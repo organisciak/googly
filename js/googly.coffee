@@ -259,7 +259,9 @@ $ ->
     storage.save()
 
 	chrome.extension.onMessage.addListener( (request, sender, sendResponse) ->
-		if request.type is "new_eye"
+		if request.type is "add"
 			googly_storage.add new Eye $("body")
 			sendResponse({status:"success", action:"add eye"})
+		else if request.type is "exists"
+			sendResponse({status:"success", action:"check script injection"})
 	  )
