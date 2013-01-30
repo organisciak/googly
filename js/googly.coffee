@@ -194,7 +194,7 @@ class Storage
         else
             @_draw(eye_data)
     
-    _draw: (eye_data) ->
+    _draw: (eye_data) =>
         if $.isEmptyObject(eye_data)
             console.log "Eye data is empty. Drawing default"
             t = new Eye $("body")
@@ -207,6 +207,7 @@ class Storage
                 .position(eye.eye.left, eye.eye.top)
                 .pupil(eye.pupil.left, eye.pupil.top, 0)
             this.add t
+        @save()
         return
             
     load_extension: (data) ->

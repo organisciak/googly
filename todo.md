@@ -1,13 +1,16 @@
 # Bugs 
-* If you load data and then don't touch the eye, the data is deleted
 
 # Features
+* Convert option.js to coffescript
+* remove Closure compiler and simply inject full jQuery
+* Hold Shift Key to resize
 * When eye data is available, change the icon color instead of alerting
-* Option for auto-load data when already save
+* Option for auto-loading data when already save
 * Hover option to share a site's eyes from the data page
 
 #Fixed
 * Don't allow multiple loads. On first load inject script, on subsequent loads the button simply adds a new eyeball.
+* If you load data and then don't touch the eye, the data is deleted
 
 #Done
 * New eyes appear at top of window, not at the top of the page
