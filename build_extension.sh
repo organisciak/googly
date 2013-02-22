@@ -34,9 +34,10 @@ cp js/background.js extension/js/background.js
 cp js/options.js extension/js/options.js
 
 echo "Compiling Javascript files..."
-javascripts=(js/lib/jquery-1.8.3.js js/lib/jquery-ui-1.9.2.custom.js js/lib/json2.js js/googly.js)
-commands=$(for file in "${javascripts[@]}"; do echo "--js $file"; done)
-java -jar lib/compiler-latest/compiler.jar --jscomp_off=suspiciousCode --js_output_file extension/js/inject.js $commands
+#javascripts=(js/lib/jquery-1.8.3.js js/lib/jquery-ui-1.9.2.custom.js js/lib/json2.js js/googly.js)
+#commands=$(for file in "${javascripts[@]}"; do echo "--js $file"; done)
+#java -jar lib/compiler-latest/compiler.jar --jscomp_off=suspiciousCode --js_output_file extension/js/inject.js $commands
+cp js/googly.js extension/js/
 
 echo "Compiling SCSS to CSS..."
 mkdir -p extension/css/images
@@ -44,7 +45,8 @@ sass --style compressed css/googly.scss:extension/css/googly.css --style compres
 
 echo "Moving Libraries for option page"
 cp css/chrome-bootstrap/chrome-bootstrap.css extension/css/
-cp js/lib/jquery-1.8.3.js extension/js/
+#cp js/lib/jquery-1.8.3.js extension/js/
+cp -r  js/lib extension/js
 
 echo "Moving CSS files to extension folder..."
 rm -rf extension/css/images/*

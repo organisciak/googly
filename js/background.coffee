@@ -20,11 +20,26 @@ loadEyes = (tabid = null) ->
         )
     chrome.tabs.executeScript(
         tabid, 
-        {file: "js/inject.js"},
+        {file: "js/lib/jquery-1.8.3.js"},
         () ->
-            console.log "Sending test message to #{tabid}"
-            return true
-        )
+          chrome.tabs.executeScript(
+            tabid,
+            {file:"js/lib/jquery-ui-1.9.2.custom.min.js"},
+            () ->
+              chrome.tabs.executeScript(
+                tabid,
+                {file:"js/lib/json2.js"},
+                () ->
+                  chrome.tabs.executeScript(
+                    tabid,
+                    {file: "js/googly.js"},
+                    () ->
+                      console.log "Sending test message to #{tabid}"
+                      return true
+                  )
+              )
+          )
+    )
 
 #Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener( (tab) ->
