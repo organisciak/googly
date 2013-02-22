@@ -24,11 +24,69 @@ class Trash
 trash = new Trash
 
 ### Create Eyeball ###
+class EyeList extends Backbone.Collection
+  model: Eye
 
-class Eye
+class EyeView extends Backbone.View
+  defaults:
+    size: 40
+  
+  initialize: ->
+    _.bindAll @
+
+  render: ->
+    @item = $("<div class='eye'>")
+    return
+
+  size: (x, speed = 0) =>
+    @_properties.size = x
+    that = @item
+    borderWidth = 1 + x/10
+    that
+        .animate({
+                "width": x
+                "height": x
+                "border-radius": x
+                "border-width": borderWidth
+                "margin" : -x
+                },
+                speed
+        )
+    
+    #Pupil Sizing   
+    that.children(".pupil")
+        .css("width", x*2/3)
+        .css("height", x*2/3)
+        .css("border-radius", x*2/3)
+    
+    #Pupil position
+    @pupil(@_properties.pupil.left, @_properties.pupil.top, 0)
+    
+    #Bounding box Size
+    ###that.children(".bounding-box")
+      .css("width", that.innerWidth() )
+      .css("height", that.innerWidth() )
+      .css("top", -borderWidth/2)
+      .css("left", -borderWidth/2)###
+        
+    #Inverse margins so element doesn't take up any space in parent
+    @
+
+  position: (left, top, speed = 0) =>
+    [@_properties.eye.left,@_properties.eye.top] = [left, top]
+    that = @item
+    that
+      .animate({
+        "left":left
+        "top": top
+        },
+      speed)
+    @
+      
+ 
+class Eye extends Backbone.Model
     constructor: (@parent) ->
         @_properties = 
-            size: 40
             eye:
                 left: 40+document.body.scrollLeft
                 top: 40+document.body.scrollTop
@@ -36,8 +94,6 @@ class Eye
                 left: 0
                 top: 0
         that = this
-        @item = $("<div class='eye'>")
-        #b = $("<div class='bounding-box'>")
         p = $("<div class='pupil'>")
         @item
             .resizable({ 
@@ -77,62 +133,13 @@ class Eye
                 that.pupil(e.offsetX/esize, e.offsetY/esize)
             .dblclick (e) ->
                 googly_storage.add new Eye $("body")
-            #.append(b)
             .append(p)
             .prependTo(@parent)
         this
             .position(@_properties.eye.left, @_properties.eye.top)
             .size(@_properties.size)
         
-    delete: =>
-        console.log "Delete me!"
-    
-    size: (x, speed = 0) =>
-        @_properties.size = x
-        that = @item
-        borderWidth = 1 + x/10
-        that
-            .animate({
-                    "width": x
-                    "height": x
-                    "border-radius": x
-                    "border-width": borderWidth
-                    "margin" : -x
-                    },
-                    speed
-            )
-        
-        #Pupil Sizing   
-        that.children(".pupil")
-            .css("width", x*2/3)
-            .css("height", x*2/3)
-            .css("border-radius", x*2/3)
-        
-        #Pupil position
-        @pupil(@_properties.pupil.left, @_properties.pupil.top, 0)
-        
-        #Bounding box Size
-        ###that.children(".bounding-box")
-            .css("width", that.innerWidth() )
-            .css("height", that.innerWidth() )
-            .css("top", -borderWidth/2)
-            .css("left", -borderWidth/2)###
-            
-        #Inverse margins so element doesn't take up any space in parent
-        @
-
-    position: (left, top, speed = 0) =>
-        [@_properties.eye.left,@_properties.eye.top] = [left, top]
-        that = @item
-        that
-            .animate({
-            "left":left
-            "top": top
-            },
-            speed)
-        @
-        
-    export: ->
+   export: ->
         ### Return object representation of this eye's data ###
         @_properties
     
@@ -227,42 +234,45 @@ class Storage
         return
 
 $ ->
-    trash.draw()
-    window.googly_storage = new Storage("extension")
-    storage = googly_storage
-    
-    a = [{
-        size: 60
-        eye: {
-            zIndex:3
-            left:334
-            top:156
-        }
-        pupil: {
-            left:1
-            top:1
-        }
-    },{
-        size: 30
-        eye: {
-            zIndex:3
-            left:30
-            top:60
-        }
-        pupil: {
-            left:0.5
-            top:0
-        }
-    }
-    ]
-    
-    storage.load(false)
-    storage.save()
+  #trash.draw()
+  #window.googly_storage = new Storage("extension")
+  #storage = googly_storage
+  
+  eye = Eye()
+  eyeView model:eye
 
-	chrome.extension.onMessage.addListener( (request, sender, sendResponse) ->
-		if request.type is "add"
-			googly_storage.add new Eye $("body")
-			sendResponse({status:"success", action:"add eye"})
-		else if request.type is "exists"
-			sendResponse({status:"success", action:"check script injection"})
-	  )
+  a = [{
+      size: 60
+      eye: {
+          zIndex:3
+          left:334
+          top:156
+      }
+      pupil: {
+          left:1
+          top:1
+      }
+  },{
+      size: 30
+      eye: {
+          zIndex:3
+          left:30
+          top:60
+      }
+      pupil: {
+          left:0.5
+          top:0
+      }
+  }
+  ]
+    
+  #storage.load(false)
+  #storage.save()
+
+  chrome.extension.onMessage.addListener( (request, sender, sendResponse) ->
+    if request.type is "add"
+      googly_storage.add new Eye $("body")
+      sendResponse({status:"success", action:"add eye"})
+    else if request.type is "exists"
+      sendResponse({status:"success", action:"check script injection"})
+  )
