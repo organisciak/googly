@@ -2,7 +2,7 @@
 .sass*
 *~
 *.swp
-lib/
+lib/compiler-latest/
 extension/css/chrome-bootstrap.css
 extension/js/jquery-1.8.3.js
 extension/js/options.js

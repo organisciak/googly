@@ -32,10 +32,20 @@ loadEyes = (tabid = null) ->
                 () ->
                   chrome.tabs.executeScript(
                     tabid,
-                    {file: "js/googly.js"},
+                    {file:"js/lib/underscore-min.js"},
                     () ->
-                      console.log "Sending test message to #{tabid}"
-                      return true
+                      chrome.tabs.executeScript(
+                        tabid,
+                        {file:"js/lib/backbone-min.js"},
+                        () ->
+                          chrome.tabs.executeScript(
+                            tabid,
+                            {file: "js/googly.js"},
+                            () ->
+                              console.log "Sending test message to #{tabid}"
+                              return true
+                          )
+                      )
                   )
               )
           )
