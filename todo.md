@@ -1,8 +1,9 @@
 # Bugs 
 
 # Features
+* Deleting eyes
+* Deleting all information from a page
 * Convert option.js to coffescript
-* remove Closure compiler and simply inject full jQuery
 * Hold Shift Key to resize
 * When eye data is available, change the icon color instead of alerting
 * Option for auto-loading data when already save
@@ -14,6 +15,7 @@
 
 #Done
 * New eyes appear at top of window, not at the top of the page
+* remove Closure compiler and simply inject full jQuery
 * Functionality to delete eyes
 * Functionality to delete all data for a page
 * Watch pages and alert when there is data for a page
