@@ -1,245 +1,71 @@
 $ = jQuery
 
-### Create Trash ###
-class Trash
-    draw: ->
-        t = $("<div class='trash'>")
-        t
-            .html("This is the trash")
-            .hide()
-            .prependTo("body")
-            
-        @element = t
-    show: ->
-        @element.slideDown("fast")
-    hide: ->
-        @element.slideUp()
-    borders: ->
-        {top:top, left:left} = @element.position()
-        [bottom, right] = [top+@element.height(), left+@element.width()]
-        {"top":top, "left":left, "bottom":bottom, "right":right}
-    delete: ->
-        return
+### Page ###
+class PageView extends Backbone.View
+  el: 'body'
 
-trash = new Trash
+  initialize: ->
+    _.bindAll @
+
+    @collection = new EyeList
+    # Bind this view's @appendItem to the collection's @add
+    @collection.bind 'add', @appendItem
+
+    @render()
+
+  render: ->
+    ''' $el is a cached JQuery object, to avoid rewrapping '''
+    @$el.prepend '<div style="border:solid 1px">Eye Container</div>'
+  
+  addItem: ->
+    '''
+    Creates an eye model and passes to the rendering method.
+    '''
+    eye = new Eye
+    @collection.add eye
+
+  appendItem: (eye) ->
+    '''
+    Creates a view of an eye model.
+    '''
+    eye_view = new EyeView(model:eye)
+    @$el.append item_view.render().el
 
 ### Create Eyeball ###
 class EyeList extends Backbone.Collection
   model: Eye
 
 class EyeView extends Backbone.View
-  defaults:
-    size: 40
-  
+  el: $ 'body'
+
   initialize: ->
     _.bindAll @
 
+    @model.bind 'change', @render
+    @model.bind 'remove', @unrender
+  
   render: ->
-    @item = $("<div class='eye'>")
-    return
+    @$el.prepend("<div class='eye'>")
 
-  size: (x, speed = 0) =>
-    @_properties.size = x
-    that = @item
-    borderWidth = 1 + x/10
-    that
-        .animate({
-                "width": x
-                "height": x
-                "border-radius": x
-                "border-width": borderWidth
-                "margin" : -x
-                },
-                speed
-        )
-    
-    #Pupil Sizing   
-    that.children(".pupil")
-        .css("width", x*2/3)
-        .css("height", x*2/3)
-        .css("border-radius", x*2/3)
-    
-    #Pupil position
-    @pupil(@_properties.pupil.left, @_properties.pupil.top, 0)
-    
-    #Bounding box Size
-    ###that.children(".bounding-box")
-      .css("width", that.innerWidth() )
-      .css("height", that.innerWidth() )
-      .css("top", -borderWidth/2)
-      .css("left", -borderWidth/2)###
-        
-    #Inverse margins so element doesn't take up any space in parent
-    @
-
-  position: (left, top, speed = 0) =>
-    [@_properties.eye.left,@_properties.eye.top] = [left, top]
-    that = @item
-    that
-      .animate({
-        "left":left
-        "top": top
-        },
-      speed)
-    @
-      
- 
 class Eye extends Backbone.Model
-    constructor: (@parent) ->
-        @_properties = 
-            eye:
-                left: 40+document.body.scrollLeft
-                top: 40+document.body.scrollTop
-            pupil:
-                left: 0
-                top: 0
-        that = this
-        p = $("<div class='pupil'>")
-        @item
-            .resizable({ 
-                autoHide: true
-                aspectRatio: true
-                resize: ( event, ui ) ->
-                    that.size ui.size.width
-                handles: "ne, se, sw, nw"
-                stop: (event, ui ) ->
-                    googly_storage.save()
-            })
-            .draggable({
-                #stack:  '.eye'
-                zIndex: 1200
-                #snap: '.trash'
-                snapMode: 'inner'
-                start: -> trash.show()
-                drag: (event, ui) ->
-                    #Check for overlap with trash
-                    t_bord = trash.borders()
-                    if (t_bord.top < ui.position.top < t_bord.bottom) and (t_bord.left < ui.position.left < t_bord.right)
-                        console.log("Delete?")
-                        $(this).css("opacity", 0.6)
-                    else
-                        $(this).css("opacity", 1)
-                stop: (event, ui) -> 
-                    t_bord = trash.borders()
-                    if (t_bord.top < ui.position.top < t_bord.bottom) and (t_bord.left < ui.position.left < t_bord.right)
-                        that.delete()
-                    else
-                        {top:that._properties.eye.top, left:that._properties.eye.left} = ui.position
-                    trash.hide()
-                    googly_storage.save()
-                })
-            .click (e) ->
-                esize = $(this).outerWidth()
-                that.pupil(e.offsetX/esize, e.offsetY/esize)
-            .dblclick (e) ->
-                googly_storage.add new Eye $("body")
-            .append(p)
-            .prependTo(@parent)
-        this
-            .position(@_properties.eye.left, @_properties.eye.top)
-            .size(@_properties.size)
-        
-   export: ->
-        ### Return object representation of this eye's data ###
-        @_properties
-    
-    pupil: (left, top, speed = 300) =>
-        ### Pupil position
-        Takes a number from 0 to 1, referring 
-        to the left to right and top to bottom position
-        of the pupil
-        ###
-        [@_properties.pupil.left,@_properties.pupil.top] = [left, top]
-        that = this.item
-        psizeDiff = that.innerWidth()-that.children(".pupil").outerWidth()
-        that.children(".pupil")
-            .animate(
-                    {
-                    "margin-left": psizeDiff*left
-                    "margin-top": psizeDiff*top
-                    },
-                    speed
-                )
-        @
-        
-### Constancy functions ###
-class Storage
-    constructor: (@type, @list =[]) ->
-        @key = window.location.href
-    
-    add: (item) ->
-        @list.push(item)
-        
-    save: () ->
-        data = (eye.export() for eye in @list)
-        if @type is "local"
-            @save_local(data)
-        else if @type is "extension"
-            @save_extension(data)
-            
-    save_local: (data) ->
-        str = JSON.stringify data
-        localStorage.setItem(@key, str)
-        console.log "Saved localStorage key for #{@key}:#{str}"
-    
-    save_extension: (data) ->
-        chrome.extension.sendMessage(
-            {task:"save", data:data}, 
-            (response) ->
-              if response.status is 'success'
-                console.log 'Saved to extension storage successfully'
-        )
 
-    load: (eye_data = false) ->
-        if not eye_data
-            if @type is "local"
-                eye_data = @load_local()
-                @_draw(eye_data)
-                console.log "Loaded localStorage key for #{@key}"
-            else if @type is "extension"
-                @load_extension()
-        else
-            @_draw(eye_data)
-    
-    _draw: (eye_data) =>
-        if $.isEmptyObject(eye_data)
-            console.log "Eye data is empty. Drawing default"
-            t = new Eye $("body")
-            this.add t
-        for eye in eye_data
-            console.log eye
-            t = new Eye $("body")
-            t
-                .size(eye.size)
-                .position(eye.eye.left, eye.eye.top)
-                .pupil(eye.pupil.left, eye.pupil.top, 0)
-            this.add t
-        @save()
-        return
-            
-    load_extension: (data) ->
-        chrome.extension.sendMessage(
-            {task:"load"}, 
-            (response) =>
-              if response.status is "success"
-                  @_draw(response.data)
-              
-        )
-    
-    load_local: ->
-        str = localStorage.getItem(@key)
-        JSON.parse str
-        
-    delete: ->
-        return
+  defaults:
+    size: 40
+    position:
+      eye:
+        left: 40
+        top:40
+      pupil:
+        left:0
+        top:0
+
+### Constancy functions ###
 
 $ ->
-  #trash.draw()
-  #window.googly_storage = new Storage("extension")
-  #storage = googly_storage
-  
-  eye = Eye()
-  eyeView model:eye
+  canvas = new PageView
+  #eye = new EyeView()
+  '''eye = Eye()
+  view = EyeView model:eye
 
   a = [{
       size: 60
@@ -252,27 +78,7 @@ $ ->
           left:1
           top:1
       }
-  },{
-      size: 30
-      eye: {
-          zIndex:3
-          left:30
-          top:60
-      }
-      pupil: {
-          left:0.5
-          top:0
-      }
   }
-  ]
+  ]'''
     
-  #storage.load(false)
-  #storage.save()
 
-  chrome.extension.onMessage.addListener( (request, sender, sendResponse) ->
-    if request.type is "add"
-      googly_storage.add new Eye $("body")
-      sendResponse({status:"success", action:"add eye"})
-    else if request.type is "exists"
-      sendResponse({status:"success", action:"check script injection"})
-  )

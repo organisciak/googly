@@ -9,3 +9,4 @@ extension/js/options.js
 extension/*
 js/background.js
 js/googly.js
+*.bak
