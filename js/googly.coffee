@@ -6,16 +6,12 @@ class PageView extends Backbone.View
 
   initialize: ->
     _.bindAll @
-
     @collection = new EyeList
-    # Bind this view's @appendItem to the collection's @add
-    @collection.bind 'add', @appendItem
-
     @render()
 
   render: ->
     ''' $el is a cached JQuery object, to avoid rewrapping '''
-    @$el.prepend '<div style="border:solid 1px">Eye Container</div>'
+    @$el.prepend '<div class="pageView" style="border:solid 1px">Eye Container</div>'
   
   addItem: ->
     '''
@@ -29,23 +25,72 @@ class PageView extends Backbone.View
     Creates a view of an eye model.
     '''
     eye_view = new EyeView(model:eye)
-    @$el.append item_view.render().el
+    $("div.pageView").append item_view.render().el
 
 ### Create Eyeball ###
 class EyeList extends Backbone.Collection
   model: Eye
 
+  initialize: ->
+    @on('remove', @hideModel, @)
+
+  hideModel: (eye) ->
+    eye.trigger 'hide'
+
+
+class EyeListView extends Backbone.View
+  initialize: ->
+    @collection.on('add', @addEye, @)
+    @collection.on('reset', @addAll, @)
+
+  addEye: (eye) ->
+    ''' Create a view for an eye model. '''
+    eyeView = new EyeView({model: eye})
+    eyeView.render()
+    @$el.append eyeView.el
+
+  addAll: ->
+    @$el.html("")
+    ''' Create view and call render() for all the items in the list '''
+    @collection.forEach(@addEye, @)
+
+  render: ->
+    @addAll()
+
+
 class EyeView extends Backbone.View
-  el: $ 'body'
+  tagName: 'div'
+  className: 'eye'
+  template: _.template('<div class="pupil"></div>')
+  events:
+    'click': 'movepupil',
+    'dblclick': 'newEye'
 
   initialize: ->
     _.bindAll @
 
-    @model.bind 'change', @render
-    @model.bind 'remove', @unrender
-  
-  render: ->
-    @$el.prepend("<div class='eye'>")
+    # @model.bind 'change', @render
+    # @model.bind 'remove', @remove
+    # Event Bindings
+    console.log @model
+    @model.on('change', @render, @)
+    @model.on('destroy', @remove, @)
+    @model.on('hide', @remove, @)
+
+  render: =>
+    @$el.html @template(@model.toJSON)
+    console.log "rendering"
+
+  remove: =>
+    @$el.remove()
+
+  movepupil: (e) =>
+    '''Placeholder for click event'''
+    console.log(@model.get('title'))
+
+  newEye: (e) =>
+    ''' Placeholder for doubleclick event'''
+    return
 
 class Eye extends Backbone.Model
 
@@ -62,8 +107,22 @@ class Eye extends Backbone.Model
 ### Constancy functions ###
 
 $ ->
-  canvas = new PageView
-  #eye = new EyeView()
+  #canvas = new PageView
+  #canvas.addItem()
+  eyeList = new EyeList()
+  eyeListView = new EyeListView({collection: eyeList})
+  
+  eye = new Eye({title:"Hello"})
+  eyeList.add(eye)
+  
+  eye = new Eye({title:"World"})
+  eyeList.add(eye)
+
+  eyeListView.render()
+  eyeListView.render()
+  console.log eyeList.toJSON()
+  $('body').prepend(eyeListView.el)
+
   '''eye = Eye()
   view = EyeView model:eye
 
