@@ -1,12 +1,18 @@
 $ = jQuery
 
+App = {
+  Models:{},
+  Views:{},
+  Collections:{}
+}
+
 ### Page ###
-class PageView extends Backbone.View
+class App.Views.Page extends Backbone.View
   el: 'body'
 
   initialize: ->
     _.bindAll @
-    @collection = new EyeList
+    @collection = new App.Collections.Eyes
     @render()
 
   render: ->
@@ -17,19 +23,19 @@ class PageView extends Backbone.View
     '''
     Creates an eye model and passes to the rendering method.
     '''
-    eye = new Eye
+    eye = new App.Models.Eye
     @collection.add eye
 
   appendItem: (eye) ->
     '''
     Creates a view of an eye model.
     '''
-    eye_view = new EyeView(model:eye)
+    eye_view = new App.Views.Eye(model:eye)
     $("div.pageView").append item_view.render().el
 
 ### Create Eyeball ###
-class EyeList extends Backbone.Collection
-  model: Eye
+class App.Collections.Eyes extends Backbone.Collection
+  model: App.Models.Eye
 
   initialize: ->
     @on('remove', @hideModel, @)
@@ -38,14 +44,14 @@ class EyeList extends Backbone.Collection
     eye.trigger 'hide'
 
 
-class EyeListView extends Backbone.View
+class App.Views.EyeList extends Backbone.View
   initialize: ->
     @collection.on('add', @addEye, @)
     @collection.on('reset', @addAll, @)
 
   addEye: (eye) ->
     ''' Create a view for an eye model. '''
-    eyeView = new EyeView({model: eye})
+    eyeView = new App.Views.Eye({model: eye})
     eyeView.render()
     @$el.append eyeView.el
 
@@ -57,7 +63,7 @@ class EyeListView extends Backbone.View
   render: ->
     @addAll()
 
-class EyeView extends Backbone.View
+class App.Views.Eye extends Backbone.View
   tagName: 'div'
   className: 'eye'
   # Pro-tip: model.escape is better than model.get in templates, to avoid XSS
@@ -196,7 +202,7 @@ class EyeView extends Backbone.View
     ''' Placeholder for doubleclick event'''
     console.log "TODO: New Eye event"
 
-class Eye extends Backbone.Model
+class App.Models.Eye extends Backbone.Model
 
 defaults:
   size: 40
@@ -210,13 +216,13 @@ defaults:
 $ ->
   #canvas = new PageView
   #canvas.addItem()
-  eyeList = new EyeList()
-  eyeListView = new EyeListView({collection: eyeList})
+  eyeList = new App.Collections.Eyes()
+  eyeListView = new App.Views.EyeList({collection: eyeList})
 
-  eye = new Eye({title:"Hello"})
+  eye = new App.Models.Eye({title:"Hello"})
   eyeList.add(eye)
   
-  eye = new Eye({title:"World", size:80})
+  eye = new App.Models.Eye({title:"World", size:80})
   eyeList.add(eye)
 
   eyeListView.render()
@@ -224,8 +230,8 @@ $ ->
   console.log eyeList.toJSON()
   $('body').prepend(eyeListView.el)
 
-  '''eye = Eye()
-  view = EyeView model:eye
+  '''eye = App.Models.Eye()
+  view = App.Views.Eye model:eye
 
   a = [{
       size: 60
