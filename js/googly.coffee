@@ -1,10 +1,24 @@
 $ = jQuery
 
-App = {
-  Models:{},
-  Views:{},
+App = new (Backbone.View.extend({
+  Models:{}
+  Views:{}
   Collections:{}
-}
+  events: {}
+  start: ->
+    eyeList = new App.Collections.Eyes()
+    eyeListView = new App.Views.EyeList({collection: eyeList})
+
+    eye = new App.Models.Eye({title:"Hello"})
+    eyeList.add(eye)
+    
+    eye = new App.Models.Eye({title:"World", size:80})
+    eyeList.add(eye)
+
+    eyeListView.render()
+    console.log eyeList.toJSON()
+    $('body').prepend(eyeListView.el)
+}))({el: document.body})
 
 ### Page ###
 class App.Views.Page extends Backbone.View
@@ -81,6 +95,9 @@ class App.Views.Eye extends Backbone.View
       # Save object
       @model.set({'size' : ui.size.width})
     'resize': (e, ui) ->
+      e.preventDefault()
+      # TODO: setting the size turns on the pupil animation, which
+      # is run hundreds of times...
       @model.set({'size' : ui.size.width})
 
   initialize: ->
@@ -115,8 +132,8 @@ class App.Views.Eye extends Backbone.View
       })
 
     # Positioning and size
-    @renderPosition(speed = 0)
-    @movePupil(speed = 0)
+    @renderPosition(0)
+    @movePupil(0)
     @renderSize()
 
   remove: =>
@@ -138,7 +155,7 @@ class App.Views.Eye extends Backbone.View
       .css("height", size * 2 / 3)
       .css("border-radius", size * 2 / 3)
     # Pupil Position
-    @movePupil()
+    @movePupil(0)
 
     #Pupil position
     # @pupilPosition(@model.get('pupilLeft'), @model.get('pupilTop'), 0)
@@ -153,7 +170,7 @@ class App.Views.Eye extends Backbone.View
     #Inverse margins so element doesn't take up any space in parent
     @
 
-  movePupil: (speed = 300) =>
+  movePupil: (speed = 0) =>
     ### Move pupil to position set in model attributes 'pupilLeft' and
     # 'pupilTop'
     ###
@@ -214,21 +231,7 @@ defaults:
 ### Constancy functions ###
 
 $ ->
-  #canvas = new PageView
-  #canvas.addItem()
-  eyeList = new App.Collections.Eyes()
-  eyeListView = new App.Views.EyeList({collection: eyeList})
-
-  eye = new App.Models.Eye({title:"Hello"})
-  eyeList.add(eye)
-  
-  eye = new App.Models.Eye({title:"World", size:80})
-  eyeList.add(eye)
-
-  eyeListView.render()
-  eyeListView.render()
-  console.log eyeList.toJSON()
-  $('body').prepend(eyeListView.el)
+  App.start()
 
   '''eye = App.Models.Eye()
   view = App.Views.Eye model:eye
