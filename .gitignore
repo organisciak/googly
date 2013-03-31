@@ -11,3 +11,4 @@ extension/*
 scripts/app/*/*.js
 /scripts/app.js
 /scripts/background.js
+/scripts/boilerplate.js

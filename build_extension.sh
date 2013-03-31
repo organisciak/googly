@@ -2,7 +2,6 @@
 
 ### CHROME EXTENSION BUILD SCRIPT ###
 # Requirements:
-# * Closure Compiler - Download from https://docs.google.com/viewer?url=http%3A%2F%2Fclosure-compiler.googlecode.com%2Ffiles%2Fcompiler-latest.zip and extract full folder to lib/
 # * Coffeescript
 # * SASS - http://sass-lang.com/
 
@@ -27,26 +26,31 @@ fi
 rm extension/manifest.json.bak
 
 echo "Compiling Coffeescript"
-coffee -c js/
+coffee --compile --output scripts scripts
 
 echo "Moving background.js and option.js"
 cp js/background.js extension/js/background.js
 cp js/options.js extension/js/options.js
 
-echo "Compiling Javascript files..."
-#javascripts=(js/lib/jquery-1.8.3.js js/lib/jquery-ui-1.9.2.custom.js js/lib/json2.js js/googly.js)
-#commands=$(for file in "${javascripts[@]}"; do echo "--js $file"; done)
-#java -jar lib/compiler-latest/compiler.jar --jscomp_off=suspiciousCode --js_output_file extension/js/inject.js $commands
-cp js/googly.js extension/js/
+echo "Compiling RequireJS files with Uglify and r.js..."
+if [ "$1" != "-d" ]; then
+	node lib/r.js -o build.js
+else
+	node lib/r.js -o build.js optimize=none
+fi
 
 echo "Compiling SCSS to CSS..."
 mkdir -p extension/css/images
-sass --style compressed css/googly.scss:extension/css/googly.css --style compressed
+if [ "$1" != "-d" ]; then
+	sass css/googly.scss:extension/css/googly.css
+else
+	sass css/googly.scss:extension/css/googly.css --style compressed
+fi
 
 echo "Moving Libraries for option page"
 cp css/chrome-bootstrap/chrome-bootstrap.css extension/css/
-#cp js/lib/jquery-1.8.3.js extension/js/
-cp -r  js/lib extension/js
+cp js/lib/jquery-1.8.3.js extension/js/
+#cp -r  js/lib extension/js
 
 echo "Moving CSS files to extension folder..."
 rm -rf extension/css/images/*
@@ -60,8 +64,8 @@ echo "Cleaning filesystem..."
 rm -f extension/.DS_Store
 rm -f extension/manifest.json~
 
-#echo "Compressing extension to googly.zip..."
-#zip -r googly extension/*
+echo "Compressing extension to googly.zip..."
+zip -r googly extension/*
 
 #echo "Chrome extension compiled successfully to googly.zip."
 exit 0
