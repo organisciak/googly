@@ -1,10 +1,10 @@
 #Filename: app.js
 
 define(['jqueryui', 'underscore', 'backbone',
-  'cs!app/collections/eyes',
-  'cs!app/views/eyes',
-  'cs!app/views/eye',
-  'cs!app/models/eye'
+  'app/collections/eyes',
+  'app/views/eyes',
+  'app/views/eye',
+  'app/models/eye'
   ],
 ($, _, Backbone, Eyes, EyesView, EyeView, Eye) ->
   App = new (Backbone.View.extend({

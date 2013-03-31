@@ -7,8 +7,7 @@ require.config({
     jquery: 'lib/jquery-1.8.3',
     jqueryui: 'lib/jquery-ui-1.9.2.custom',
     underscore: 'lib/underscore',
-    backbone: 'lib/backbone',
-    'coffee-script': 'lib/coffee-script'
+    backbone: 'lib/backbone'
   },
   shim: {
        'jqueryui': {
@@ -26,7 +25,7 @@ require.config({
 
 });
 
-require(['cs!app'], function(App) {
+require(['app'], function(App) {
   // The "app" dependency is passed in as "App"
   App.start();
 });
